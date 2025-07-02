@@ -1,0 +1,39 @@
+
+# constants.py
+
+# Screen dimensions
+SCREEN_WIDTH = 1000
+SCREEN_HEIGHT = 700
+
+# Field dimensions
+FIELD_WIDTH = 900
+FIELD_HEIGHT = 600
+FIELD_X = (SCREEN_WIDTH - FIELD_WIDTH) // 2
+FIELD_Y = (SCREEN_HEIGHT - FIELD_HEIGHT) // 2
+
+# Goal dimensions
+GOAL_WIDTH = 100
+GOAL_HEIGHT = 150
+
+# Player properties
+PLAYER_RADIUS = 15
+PLAYER_SPEED = 3
+PLAYER_ACCELERATION = 0.2
+PLAYER_FRICTION = 0.1
+
+# Ball properties
+BALL_RADIUS = 10
+BALL_SPEED = 10 # Initial speed for kicks
+BALL_FRICTION = 0.05
+
+# Colors
+COLOR_FIELD = (50, 150, 50) # Green
+COLOR_LINE = (255, 255, 255) # White
+COLOR_RED_TEAM = (255, 0, 0)
+COLOR_BLUE_TEAM = (0, 0, 255)
+COLOR_BALL = (255, 255, 255)
+COLOR_GOAL = (100, 100, 100)
+
+# Game properties
+GAME_DURATION = 180 # seconds
+FPS = 60
