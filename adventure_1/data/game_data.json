@@ -1,0 +1,25 @@
+{
+    "player_stats": {
+        "hp": 100,
+        "mp": 50,
+        "attack": 10,
+        "defense": 5
+    },
+    "monsters": [
+        {
+            "name": "Goblin",
+            "hp": 30,
+            "attack": 5,
+            "defense": 2,
+            "speed": 2
+        }
+    ],
+    "items": [
+        {
+            "id": "potion_hp_small",
+            "name": "작은 체력 물약",
+            "type": "consumable",
+            "effect": {"hp_restore": 20}
+        }
+    ]
+}
