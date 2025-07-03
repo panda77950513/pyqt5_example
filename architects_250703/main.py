@@ -9,49 +9,30 @@ import architect_db as db # Assuming architect_db.py is in the same directory
 
 class ImagePlaceholder(QLabel):
     def __init__(self, width=150, height=150, parent=None):
-        super().__init__(parent)
+        QLabel.__init__(self, parent)
         self.setFixedSize(width, height)
         self.setStyleSheet("background-color: white; border: 1px solid lightgray;")
         self.setAlignment(Qt.AlignCenter)
         self.setText("No Image") # Optional text
 
-class ArchitectListItemWidget(QWidget):
-    def __init__(self, architect_name, parent=None):
-        super().__init__(parent)
-        self.layout = QHBoxLayout(self)
-        self.layout.setContentsMargins(5, 5, 5, 5)
-        self.layout.setSpacing(10)
-
-        self.image_placeholder = ImagePlaceholder(50, 50) # Smaller image for list item
-        self.layout.addWidget(self.image_placeholder)
-
-        self.name_label = QLabel(architect_name)
-        self.name_label.setFont(QFont("Arial", 12))
-        self.layout.addWidget(self.name_label)
-
-        self.layout.addStretch(1) # Push content to the left
-
-class BuildingListItemWidget(QWidget):
-    def __init__(self, building_name, parent=None):
-        super().__init__(parent)
-        self.layout = QHBoxLayout(self)
-        self.layout.setContentsMargins(5, 5, 5, 5)
-        self.layout.setSpacing(10)
-
-        self.image_placeholder = ImagePlaceholder(70, 50) # Smaller image for list item
-        self.layout.addWidget(self.image_placeholder)
-
-        self.name_label = QLabel(building_name)
-        self.name_label.setFont(QFont("Arial", 12))
-        self.layout.addWidget(self.name_label)
-
-        self.layout.addStretch(1) # Push content to the left
+    def set_image(self, image_path):
+        if image_path:
+            pixmap = QPixmap(image_path)
+            if not pixmap.isNull():
+                self.setPixmap(pixmap.scaled(self.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation))
+                self.setText("") # Remove text if image is loaded
+            else:
+                self.setText("Image Load Failed")
+                self.clear()
+        else:
+            self.setText("No Image")
+            self.clear()
 
 class ArchitectListView(QWidget):
     architect_selected = pyqtSignal(int) # Signal to emit architect ID
 
     def __init__(self, parent=None):
-        super().__init__(parent)
+        QWidget.__init__(self, parent)
         self.layout = QVBoxLayout(self)
         self.title_label = QLabel("Architects")
         self.title_label.setFont(QFont("Arial", 24, QFont.Bold))
@@ -66,16 +47,9 @@ class ArchitectListView(QWidget):
         self.architect_list_widget.clear()
         architects = db.get_architects()
         for arch in architects:
-            item = QListWidgetItem(self.architect_list_widget) # Create item
-            
-            # Create custom widget for the item
-            item_widget = ArchitectListItemWidget(f"{arch[1]} ({arch[4]})")
-            
-            item.setSizeHint(item_widget.sizeHint()) # Set item size to fit widget
+            item = QListWidgetItem(f"{arch[1]} ({arch[4]})") # Name (Nationality)
             item.setData(Qt.UserRole, arch[0]) # Store architect ID
-            
             self.architect_list_widget.addItem(item)
-            self.architect_list_widget.setItemWidget(item, item_widget)
 
     def _on_architect_clicked(self, item):
         architect_id = item.data(Qt.UserRole)
@@ -86,7 +60,7 @@ class ArchitectDetailView(QWidget):
     building_selected = pyqtSignal(int) # Signal to emit building ID
 
     def __init__(self, parent=None):
-        super().__init__(parent)
+        QWidget.__init__(self, parent)
         self.layout = QVBoxLayout(self)
 
         self.back_button = QPushButton("← Back to Architects")
@@ -121,21 +95,14 @@ class ArchitectDetailView(QWidget):
                        f"Died: {architect[3] or 'N/A'}\n" \
                        f"Bio: {architect[5] or 'N/A'}"
             self.architect_bio.setText(bio_text)
-            # Image placeholder is already set up
+            self.architect_image.set_image(architect[6]) # Set architect image
 
             self.building_list_widget.clear()
             buildings = db.get_buildings_by_architect(architect_id)
             for bld in buildings:
-                item = QListWidgetItem(self.building_list_widget) # Create item
-                
-                # Create custom widget for the item
-                item_widget = BuildingListItemWidget(bld[2]) # Building Name
-                
-                item.setSizeHint(item_widget.sizeHint()) # Set item size to fit widget
+                item = QListWidgetItem(bld[2]) # Building Name
                 item.setData(Qt.UserRole, bld[0]) # Store building ID
-                
                 self.building_list_widget.addItem(item)
-                self.building_list_widget.setItemWidget(item, item_widget)
 
     def _on_building_clicked(self, item):
         building_id = item.data(Qt.UserRole)
@@ -145,7 +112,7 @@ class BuildingDetailView(QWidget):
     back_requested = pyqtSignal(int) # Signal to emit architect ID to go back
 
     def __init__(self, parent=None):
-        super().__init__(parent)
+        QWidget.__init__(self, parent)
         self.layout = QVBoxLayout(self)
 
         self.back_button = QPushButton("← Back to Architect")
@@ -176,7 +143,7 @@ class BuildingDetailView(QWidget):
                            f"Year Completed: {building[4] or 'N/A'}\n" \
                            f"Description: {building[5] or 'N/A'}"
             self.building_details.setText(details_text)
-            # Image placeholder is already set up
+            self.building_image.set_image(building[6]) # Set building image
 
     def _on_back_clicked(self):
         self.back_requested.emit(self.current_architect_id)
@@ -191,9 +158,9 @@ class ArchitectApp(QMainWindow):
         self.stacked_widget = QStackedWidget()
         self.setCentralWidget(self.stacked_widget)
 
-        self.architect_list_view = ArchitectListView()
-        self.architect_detail_view = ArchitectDetailView()
-        self.building_detail_view = BuildingDetailView()
+        self.architect_list_view = ArchitectListView(self)
+        self.architect_detail_view = ArchitectDetailView(self)
+        self.building_detail_view = BuildingDetailView(self)
 
         self.stacked_widget.addWidget(self.architect_list_view)
         self.stacked_widget.addWidget(self.architect_detail_view)

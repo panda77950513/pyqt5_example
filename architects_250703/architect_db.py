@@ -1,4 +1,3 @@
-
 import sqlite3
 import os
 
@@ -20,7 +19,8 @@ def create_tables():
             birth_date TEXT,
             death_date TEXT,
             nationality TEXT,
-            bio TEXT
+            bio TEXT,
+            image_path TEXT
         )
     ''')
 
@@ -36,17 +36,25 @@ def create_tables():
             FOREIGN KEY (architect_id) REFERENCES architects(id)
         )
     ''')
+    
+    # Add image_path column to architects table if it doesn't exist
+    try:
+        cursor.execute("ALTER TABLE architects ADD COLUMN image_path TEXT")
+    except sqlite3.OperationalError as e:
+        if "duplicate column name" not in str(e):
+            raise
+
     conn.commit()
     conn.close()
-    print(f"Database and tables created at {get_db_path()}")
+    print(f"Database and tables created/updated at {get_db_path()}")
 
-def add_architect(name, birth_date=None, death_date=None, nationality=None, bio=None):
+def add_architect(name, birth_date=None, death_date=None, nationality=None, bio=None, image_path=None):
     conn = sqlite3.connect(get_db_path())
     cursor = conn.cursor()
     cursor.execute('''
-        INSERT INTO architects (name, birth_date, death_date, nationality, bio)
-        VALUES (?, ?, ?, ?, ?)
-    ''', (name, birth_date, death_date, nationality, bio))
+        INSERT INTO architects (name, birth_date, death_date, nationality, bio, image_path)
+        VALUES (?, ?, ?, ?, ?, ?)
+    ''', (name, birth_date, death_date, nationality, bio, image_path))
     architect_id = cursor.lastrowid
     conn.commit()
     conn.close()
@@ -63,6 +71,28 @@ def add_building(architect_id, name, location=None, year_completed=None, descrip
     conn.commit()
     conn.close()
     return building_id
+
+def update_architect_image_path(architect_id, image_path):
+    conn = sqlite3.connect(get_db_path())
+    cursor = conn.cursor()
+    cursor.execute('''
+        UPDATE architects
+        SET image_path = ?
+        WHERE id = ?
+    ''', (image_path, architect_id))
+    conn.commit()
+    conn.close()
+
+def update_building_image_path(building_id, image_path):
+    conn = sqlite3.connect(get_db_path())
+    cursor = conn.cursor()
+    cursor.execute('''
+        UPDATE buildings
+        SET image_path = ?
+        WHERE id = ?
+    ''', (image_path, building_id))
+    conn.commit()
+    conn.close()
 
 def get_architects():
     conn = sqlite3.connect(get_db_path())
@@ -90,7 +120,3 @@ def get_all_buildings():
 
 if __name__ == '__main__':
     create_tables()
-    # 예시 데이터 추가 (나중에 google_web_search로 채울 부분)
-    # architect_id = add_architect("Frank Lloyd Wright", "1867-06-08", "1959-04-09", "American", "Considered the greatest American architect of all time.")
-    # add_building(architect_id, "Fallingwater", "Mill Run, Pennsylvania, USA", 1939, "A house built partly over a waterfall.", "path/to/fallingwater.jpg")
-    # add_building(architect_id, "Guggenheim Museum", "New York City, USA", 1959, "A spiral-shaped museum.", "path/to/guggenheim.jpg")
