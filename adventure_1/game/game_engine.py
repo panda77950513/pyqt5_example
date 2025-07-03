@@ -95,9 +95,10 @@ class GameEngine(QWidget):
             if self.player.is_attacking:
                 player_attack_rect = self.player.get_attack_rect()
                 if player_attack_rect:
-                    # 공격 애니메이션이 시작될 때만 hit_monsters_in_current_attack 초기화
-                    if self.player.current_frame_index == 0 and self.player.animation_timer < self.player.animation_speed: # 공격 애니메이션의 첫 프레임일 때
+                    # 새로운 공격이 시작되었으면 hit_monsters_in_current_attack 초기화
+                    if self.player.attack_just_started:
                         self.hit_monsters_in_current_attack.clear()
+                        self.player.attack_just_started = False
 
                     monsters_to_remove = []
                     for monster in self.monsters:
@@ -124,9 +125,15 @@ class GameEngine(QWidget):
             for monster in self.monsters:
                 monster.draw(self.screen)
                 # Draw monster HP
-                font = pygame.font.Font(None, 24) # 폰트 설정
-                hp_text = font.render(f"HP: {monster.hp}", True, (255, 0, 0)) # 빨간색 텍스트
-                self.screen.blit(hp_text, (monster.rect.x, monster.rect.y - 20)) # 몬스터 위에 표시
+                # Draw player HP
+            font = pygame.font.Font(None, 36) # 폰트 설정
+            player_hp_text = font.render(f"HP: {self.player.hp}/{self.player.max_hp}", True, (0, 0, 0)) # 검정색 텍스트
+            self.screen.blit(player_hp_text, (10, 10)) # 화면 좌측 상단에 표시
+
+            # Draw monster HP
+            font = pygame.font.Font(None, 24) # 폰트 설정
+            hp_text = font.render(f"HP: {monster.hp}", True, (255, 0, 0)) # 빨간색 텍스트
+            self.screen.blit(hp_text, (monster.rect.x, monster.rect.y - 20)) # 몬스터 위에 표시
 
             # Convert Pygame surface to QImage and display in QLabel
             self.update_pygame_display()

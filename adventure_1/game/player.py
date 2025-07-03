@@ -32,12 +32,25 @@ class Player(pygame.sprite.Sprite):
         self.attack_duration = 10 # frames
         self.attack_power = 10 # 플레이어 공격력 추가
 
+        # Health
+        self.max_hp = 100
+        self.hp = self.max_hp
+
         # Animation variables
         self.current_frame_index = 0
         self.animation_speed = 0.2 # Adjust for faster/slower animation
         self.animation_timer = 0
         self.facing_right = True # Direction player is facing
         self.state = "idle" # Current animation state: "idle", "running", "jumping", "attacking"
+        self.attack_just_started = False # 새로운 공격이 시작되었는지 여부
+
+    def take_damage(self, amount):
+        self.hp -= amount
+        print(f"Player took {amount} damage. HP: {self.hp}")
+        if self.hp <= 0:
+            print("Player defeated!")
+            return True # Player is defeated
+        return False # Player is still alive
 
     def handle_event(self, event):
         # print(f"Player: Handling event - Type: {event.type}, Key: {event.key}")
@@ -60,8 +73,17 @@ class Player(pygame.sprite.Sprite):
                 if not self.is_attacking and self.attack_cooldown == 0:
                     # print("Player: Attacking")
                     self.is_attacking = True
+                    self.attack_just_started = True # 공격 시작 플래그 설정
                     self.attack_cooldown = 30 # Cooldown frames
                     self.state = "attacking"
+
+        elif event.type == pygame.KEYUP:
+            if event.key == pygame.K_LEFT and self.vel_x < 0:
+                # print("Player: Stopping left")
+                self.vel_x = 0
+            elif event.key == pygame.K_RIGHT and self.vel_x > 0:
+                # print("Player: Stopping right")
+                self.vel_x = 0
 
         elif event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT and self.vel_x < 0:

@@ -1,4 +1,4 @@
-
+ㅋㅋ
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QPushButton
 from PyQt5.QtCore import Qt, QTimer
@@ -79,7 +79,6 @@ class MainWindow(QMainWindow):
             self.main_menu.hide()
             self.layout.addWidget(self.game_engine.get_pygame_widget()) # Get the QWidget from GameEngine
             self.game_engine.start_game_loop()
-            self.setFocus() # 게임 시작 시 메인 윈도우에 포커스 설정
 
     def show_main_menu(self):
         if self.game_engine:
