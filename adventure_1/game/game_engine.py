@@ -122,18 +122,17 @@ class GameEngine(QWidget):
             #     self.screen.blit(self.background, (0, 0)) # 배경 이미지 그리는 부분 주석 처리
 
             self.player.draw(self.screen)
-            for monster in self.monsters:
-                monster.draw(self.screen)
-                # Draw monster HP
-                # Draw player HP
+            # Draw player HP
             font = pygame.font.Font(None, 36) # 폰트 설정
             player_hp_text = font.render(f"HP: {self.player.hp}/{self.player.max_hp}", True, (0, 0, 0)) # 검정색 텍스트
             self.screen.blit(player_hp_text, (10, 10)) # 화면 좌측 상단에 표시
 
-            # Draw monster HP
-            font = pygame.font.Font(None, 24) # 폰트 설정
-            hp_text = font.render(f"HP: {monster.hp}", True, (255, 0, 0)) # 빨간색 텍스트
-            self.screen.blit(hp_text, (monster.rect.x, monster.rect.y - 20)) # 몬스터 위에 표시
+            for monster in self.monsters:
+                monster.draw(self.screen)
+                # Draw monster HP
+                font = pygame.font.Font(None, 24) # 폰트 설정
+                hp_text = font.render(f"HP: {monster.hp}", True, (255, 0, 0)) # 빨간색 텍스트
+                self.screen.blit(hp_text, (monster.rect.x, monster.rect.y - 20)) # 몬스터 위에 표시
 
             # Convert Pygame surface to QImage and display in QLabel
             self.update_pygame_display()
@@ -147,7 +146,6 @@ class GameEngine(QWidget):
             raise # Re-raise the exception to see the full traceback
 
     def handle_key_event(self, event):
-        print(f"GameEngine: Received Pygame event - Type: {event.type}, Key: {event.key}")
         # Pass the event to the player
         self.player.handle_event(event)
 

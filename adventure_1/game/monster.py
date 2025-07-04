@@ -7,8 +7,8 @@ class Monster(pygame.sprite.Sprite):
         super().__init__()
         self.player = player # 플레이어 객체 참조
         # Load animation frames
-        self.idle_frames = load_animation_frames(["monster_idle_1.png", "monster_idle_2.png"], 64, 64)
-        self.walk_frames = load_animation_frames(["monster_walk_1.png", "monster_walk_2.png", "monster_walk_3.png", "monster_walk_4.png"], 64, 64)
+        self.idle_frames = load_animation_frames("monster_idle_1.png", 64, 64)
+        self.walk_frames = load_animation_frames("monster_walk_1.png", 64, 64)
 
         # Fallback to placeholder if frames are not loaded
         if not self.idle_frames: self.idle_frames = [pygame.Surface((64,64), pygame.SRCALPHA)]; self.idle_frames[0].fill((255,0,0))

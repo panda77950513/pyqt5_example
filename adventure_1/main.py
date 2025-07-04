@@ -1,7 +1,6 @@
-ㅋㅋ
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QPushButton
-from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtCore import Qt, QTimer, QEvent
 from PyQt5.QtGui import QPalette, QColor
 
 import pygame
@@ -88,29 +87,23 @@ class MainWindow(QMainWindow):
         self.layout.addWidget(self.main_menu)
         self.main_menu.show()
 
-    def keyPressEvent(self, event):
+    def eventFilter(self, source, event):
         if self.game_engine and self.game_engine.game_active:
-            qt_key = event.key()
-            print(f"MainWindow: Key Pressed - Qt Key: {qt_key}")
-            if qt_key in self._qt_to_pygame_key_map:
-                pygame_key = self._qt_to_pygame_key_map[qt_key]
-                pygame_event = pygame.event.Event(pygame.KEYDOWN, key=pygame_key)
-                self.game_engine.handle_key_event(pygame_event)
-            else:
-                print(f"MainWindow: Unmapped Qt Key: {qt_key}")
-        super().keyPressEvent(event)
-
-    def keyReleaseEvent(self, event):
-        if self.game_engine and self.game_engine.game_active:
-            qt_key = event.key()
-            print(f"MainWindow: Key Released - Qt Key: {qt_key}")
-            if qt_key in self._qt_to_pygame_key_map:
-                pygame_key = self._qt_to_pygame_key_map[qt_key]
-                pygame_event = pygame.event.Event(pygame.KEYUP, key=pygame_key)
-                self.game_engine.handle_key_event(pygame_event)
-            else:
-                print(f"MainWindow: Unmapped Qt Key: {qt_key}")
-        super().keyReleaseEvent(event)
+            if event.type() == QEvent.KeyPress:
+                qt_key = event.key()
+                if qt_key in self._qt_to_pygame_key_map:
+                    pygame_key = self._qt_to_pygame_key_map[qt_key]
+                    pygame_event = pygame.event.Event(pygame.KEYDOWN, key=pygame_key)
+                    self.game_engine.handle_key_event(pygame_event)
+                    return True # 이벤트 처리 완료
+            elif event.type() == QEvent.KeyRelease:
+                qt_key = event.key()
+                if qt_key in self._qt_to_pygame_key_map:
+                    pygame_key = self._qt_to_pygame_key_map[qt_key]
+                    pygame_event = pygame.event.Event(pygame.KEYUP, key=pygame_key)
+                    self.game_engine.handle_key_event(pygame_event)
+                    return True # 이벤트 처리 완료
+        return super().eventFilter(source, event)
 
     def closeEvent(self, event):
         if self.game_engine:
@@ -122,5 +115,6 @@ class MainWindow(QMainWindow):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()
+    app.installEventFilter(window) # 이벤트 필터 설치
     window.show()
     sys.exit(app.exec_())

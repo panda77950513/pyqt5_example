@@ -1,4 +1,3 @@
-
 import pygame
 import os
 
@@ -17,18 +16,16 @@ def load_image(filename):
         print(f"Resources: Error loading image {filename} from {path}: {e}")
         return None
 
-def load_animation_frames(filenames, frame_width, frame_height):
+def load_animation_frames(sprite_sheet_filename, frame_width, frame_height):
     frames = []
-    for filename in filenames:
-        sheet = load_image(filename)
-        if sheet:
-            # Assuming frames are arranged horizontally
-            for i in range(sheet.get_width() // frame_width):
-                frame = pygame.Surface((frame_width, frame_height), pygame.SRCALPHA)
-                frame.blit(sheet, (0, 0), (i * frame_width, 0, frame_width, frame_height))
-                frames.append(frame)
-        else:
-            print(f"Resources: Could not load sprite sheet: {filename}")
+    sheet = load_image(sprite_sheet_filename)
+    if sheet:
+        for i in range(sheet.get_width() // frame_width):
+            frame = pygame.Surface((frame_width, frame_height), pygame.SRCALPHA)
+            frame.blit(sheet, (0, 0), (i * frame_width, 0, frame_width, frame_height))
+            frames.append(frame)
+    else:
+        print(f"Resources: Could not load sprite sheet: {sprite_sheet_filename}")
     return frames
 
 def load_sound(filename):

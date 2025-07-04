@@ -1,4 +1,3 @@
-
 import pygame
 from game.resources import load_image, load_animation_frames
 
@@ -6,10 +5,10 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
         # Load animation frames
-        self.run_frames = load_animation_frames(["player_run_1.png", "player_run_2.png", "player_run_3.png", "player_run_4.png"], 64, 64)
-        self.idle_frames = load_animation_frames(["player_idle_1.png", "player_idle_2.png"], 64, 64)
-        self.jump_frames = load_animation_frames(["player_jump_1.png", "player_jump_2.png"], 64, 64)
-        self.attack_frames = load_animation_frames(["player_attack_1.png", "player_attack_2.png", "player_attack_3.png"], 64, 64)
+        self.run_frames = load_animation_frames("Samurai/Walk.png", 32, 64)
+        self.idle_frames = load_animation_frames("Samurai/Idle.png", 32, 64)
+        self.jump_frames = load_animation_frames("Samurai/Jump.png", 32, 64)
+        self.attack_frames = load_animation_frames("Samurai/Attack_1.png", 32, 64) # Attack_1.png를 예시로 사용
 
         # Fallback to placeholder if frames are not loaded
         if not self.run_frames: self.run_frames = [pygame.Surface((64,64), pygame.SRCALPHA)]; self.run_frames[0].fill((0,255,0))
@@ -38,7 +37,7 @@ class Player(pygame.sprite.Sprite):
 
         # Animation variables
         self.current_frame_index = 0
-        self.animation_speed = 0.2 # Adjust for faster/slower animation
+        self.animation_speed = 0.1 # Adjust for faster/slower animation
         self.animation_timer = 0
         self.facing_right = True # Direction player is facing
         self.state = "idle" # Current animation state: "idle", "running", "jumping", "attacking"
@@ -76,7 +75,6 @@ class Player(pygame.sprite.Sprite):
                     self.attack_just_started = True # 공격 시작 플래그 설정
                     self.attack_cooldown = 30 # Cooldown frames
                     self.state = "attacking"
-
         elif event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT and self.vel_x < 0:
                 # print("Player: Stopping left")
@@ -85,13 +83,9 @@ class Player(pygame.sprite.Sprite):
                 # print("Player: Stopping right")
                 self.vel_x = 0
 
-        elif event.type == pygame.KEYUP:
-            if event.key == pygame.K_LEFT and self.vel_x < 0:
-                # print("Player: Stopping left")
-                self.vel_x = 0
-            elif event.key == pygame.K_RIGHT and self.vel_x > 0:
-                # print("Player: Stopping right")
-                self.vel_x = 0
+
+
+
 
     def update(self):
         # Apply gravity
